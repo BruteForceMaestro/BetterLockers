@@ -1,7 +1,10 @@
-﻿using MapGeneration.Distributors;
+﻿using Exiled.API.Features;
+using MapGeneration.Distributors;
 using MEC;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Exiled.API.Features.Items;
 
 namespace BetterLockers
 {
@@ -14,10 +17,19 @@ namespace BetterLockers
 
         public IEnumerator<float> SpawnItems()
         {
-            yield return Timing.WaitForSeconds(5f); // at the start of the round not all lockers are initialized
+            yield return Timing.WaitForSeconds(1f);
             var lockers = Object.FindObjectsOfType<Locker>();
             foreach (var locker in lockers)
             {
+                if (Main.Instance.Config.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy)
+                {
+                    var locker_pickups = Map.Pickups.ToArray().Where(x => Vector3.Distance(x.Position, locker.transform.position) < 2);
+                    foreach (Pickup pickup in locker_pickups)
+                    {
+                        Log.Debug($"Destroyed {pickup.Type} pickup at {pickup.Position}");
+                        pickup.Destroy();
+                    }
+                }
                 if (Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list))
                 {
                     foreach (LockerChamber chamber in locker.Chambers)

@@ -8,7 +8,7 @@ namespace BetterLockers
     {
         EventHandlers handlers = new();
         public override string Author => "nutmaster#4861";
-        public override Version Version => new Version(1, 0, 0);
+        public override Version Version => new Version(1, 1, 0);
         public override Version RequiredExiledVersion => new Version(4, 2, 2);
         public static Main Instance { get; set; }
 
