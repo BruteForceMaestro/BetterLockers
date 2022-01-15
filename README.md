@@ -1,11 +1,13 @@
 # BetterLockers
  Allows to spawn your own items inside lockers.
-This plugin doesn't remove the items already spawned in the lockers.
-As soon as i find a way, i will add a config option.
 ## Config
 ```
 better_lockers:
   is_enabled: true
+  # Stop basegame items from spawning in lockers. StructureTypes that are not in this list will default to false
+  disable_base_game_items:
+    StandardLocker: true
+    ScpPedestal: true
   # Available types: StandardLocker, LargeGunLocker, ScpPedestal, SmallWallCabinet
   locker_spawns:
     StandardLocker:
