@@ -26,7 +26,6 @@ namespace BetterLockers
                     var locker_pickups = Map.Pickups.ToArray().Where(x => Vector3.Distance(x.Position, locker.transform.position) < 2);
                     foreach (Pickup pickup in locker_pickups)
                     {
-                        Log.Debug($"Destroyed {pickup.Type} pickup at {pickup.Position}");
                         pickup.Destroy();
                     }
                 }
