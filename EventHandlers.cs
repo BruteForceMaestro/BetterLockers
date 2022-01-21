@@ -1,10 +1,9 @@
-﻿using Exiled.API.Features;
+﻿using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using MEC;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Exiled.API.Features.Items;
 
 namespace BetterLockers
 {
@@ -23,26 +22,21 @@ namespace BetterLockers
             {
                 if (Main.Instance.Config.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy)
                 {
-                    var locker_pickups = Map.Pickups.ToArray().Where(x => Vector3.Distance(x.Position, locker.transform.position) < 2);
-                    foreach (Pickup pickup in locker_pickups)
+                    foreach (ItemPickupBase pickup in locker.Chambers.SelectMany(x => x._content))
                     {
-                        pickup.Destroy();
+                        pickup.DestroySelf();
                     }
                 }
                 if (Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list))
                 {
                     foreach (LockerChamber chamber in locker.Chambers)
                     {
-                        foreach (var spawner in list) // deep nested loops, just the way i like it.
+                        int chance = Random.Range(1, 100);
+                        var found = list.Find(x => x.chance > chance);
+                        if (found != null)
                         {
-                            int chance = Random.Range(0, 101);
-                            if (spawner.chance > chance)
-                            {
-                                chamber.SpawnItem(spawner.item, spawner.amount);
-                                break;
-                            }
+                            chamber.SpawnItem(found.item, found.amount);
                         }
-
                     }
                 }
             }
