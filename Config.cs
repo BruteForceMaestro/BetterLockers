@@ -44,5 +44,8 @@ namespace BetterLockers
                 }
             }
         };
+
+        [Description("Keep this off unless you want your console spammed.")]
+        public bool DebugMode { get; set; } = false;
     }
 }

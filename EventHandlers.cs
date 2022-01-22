@@ -1,8 +1,8 @@
-﻿using InventorySystem.Items.Pickups;
+﻿using Exiled.API.Features;
+using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
-using MEC;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace BetterLockers
@@ -11,31 +11,32 @@ namespace BetterLockers
     {
         public void OnRoundStart()
         {
-            Timing.RunCoroutine(SpawnItems());
-        }
-
-        public IEnumerator<float> SpawnItems()
-        {
-            yield return Timing.WaitForSeconds(1f);
             var lockers = Object.FindObjectsOfType<Locker>();
+            var field = typeof(LockerChamber).GetField("_content", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
             foreach (var locker in lockers)
             {
-                if (Main.Instance.Config.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy)
+                bool toDestroy = Main.Instance.Config.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy;
+                foreach (LockerChamber chamber in locker.Chambers)
                 {
-                    foreach (ItemPickupBase pickup in locker.Chambers.SelectMany(x => x._content))
+                    if (toDestroy)
                     {
-                        pickup.DestroySelf();
-                    }
-                }
-                if (Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list))
-                {
-                    foreach (LockerChamber chamber in locker.Chambers)
-                    {
-                        int chance = Random.Range(1, 100);
-                        var found = list.Find(x => x.chance > chance);
-                        if (found != null)
+                        foreach (ItemPickupBase pickup in (HashSet<ItemPickupBase>)field.GetValue(chamber))
                         {
-                            chamber.SpawnItem(found.item, found.amount);
+                            pickup.DestroySelf();
+                            Log.Debug($"Pickup Destroyed: {Map.FindParentRoom(locker.gameObject)} | {pickup.Info.ItemId}", Main.Instance.Config.DebugMode);
+                        }
+                    }
+                    if (Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list))
+                    {
+                        foreach (Spawner spawner in list)
+                        {
+                            if (spawner.chance < Random.Range(1, 100))
+                            {
+                                continue;
+                            }
+                            chamber.SpawnItem(spawner.item, spawner.amount);
+                            Log.Debug($"Pickup Spawned: {Map.FindParentRoom(locker.gameObject)} | {spawner.item}", Main.Instance.Config.DebugMode);
+                            break;
                         }
                     }
                 }
