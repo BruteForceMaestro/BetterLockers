@@ -16,6 +16,7 @@ namespace BetterLockers
             foreach (var locker in lockers)
             {
                 bool toDestroy = Main.Instance.Config.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy;
+                bool toSpawn = Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list);
                 foreach (LockerChamber chamber in locker.Chambers)
                 {
                     if (toDestroy)
@@ -23,10 +24,9 @@ namespace BetterLockers
                         foreach (ItemPickupBase pickup in (HashSet<ItemPickupBase>)field.GetValue(chamber))
                         {
                             pickup.DestroySelf();
-                            Log.Debug($"Pickup Destroyed: {Map.FindParentRoom(locker.gameObject)} | {pickup.Info.ItemId}", Main.Instance.Config.DebugMode);
                         }
                     }
-                    if (Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list))
+                    if (toSpawn)
                     {
                         foreach (Spawner spawner in list)
                         {
@@ -35,7 +35,6 @@ namespace BetterLockers
                                 continue;
                             }
                             chamber.SpawnItem(spawner.item, spawner.amount);
-                            Log.Debug($"Pickup Spawned: {Map.FindParentRoom(locker.gameObject)} | {spawner.item}", Main.Instance.Config.DebugMode);
                             break;
                         }
                     }

@@ -17,7 +17,7 @@ namespace BetterLockers
         };
         
         [Description("Available types: StandardLocker, LargeGunLocker, ScpPedestal, SmallWallCabinet")]
-        public Dictionary<StructureType, List<Spawner>> LockerSpawns { get; set; } = new()
+        public Dictionary<StructureType, List<Spawner>> LockerSpawns { get; set; } = new Dictionary<StructureType, List<Spawner>>()
         {
             [StructureType.StandardLocker] = new List<Spawner>
             {
