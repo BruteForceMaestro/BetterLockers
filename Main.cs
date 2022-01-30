@@ -6,24 +6,22 @@ namespace BetterLockers
 {
     public class Main : Plugin<Config>
     {
-        EventHandlers handlers = new EventHandlers();
+        EventHandlers handlers;
         public override string Author => "nutmaster#4861";
         public override Version Version => new Version(1, 1, 2);
         public override Version RequiredExiledVersion => new Version(4, 2, 3);
-        public static Main Instance { get; set; }
 
         public override void OnEnabled()
         {
-            Instance = this;
-            handlers = new EventHandlers();
+            handlers = new EventHandlers(this);
             Server.RoundStarted += handlers.OnRoundStart;
             base.OnEnabled();
         }
 
         public override void OnDisabled()
         {
-            handlers = null;
             Server.RoundStarted -= handlers.OnRoundStart;
+            handlers = null;
             base.OnDisabled();
         }
     }

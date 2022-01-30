@@ -1,27 +1,28 @@
-﻿using Exiled.API.Features;
-using InventorySystem.Items.Pickups;
+﻿using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 namespace BetterLockers
 {
     internal class EventHandlers
     {
+        private readonly Config cfg;
+        public EventHandlers(Main plugin)
+        {
+            cfg = plugin.Config;
+        }
         public void OnRoundStart()
         {
             var lockers = Object.FindObjectsOfType<Locker>();
-            var field = typeof(LockerChamber).GetField("_content", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
             foreach (var locker in lockers)
             {
-                bool toDestroy = Main.Instance.Config.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy;
-                bool toSpawn = Main.Instance.Config.LockerSpawns.TryGetValue(locker.StructureType, out var list);
+                bool toDestroy = cfg.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy;
+                bool toSpawn = cfg.LockerSpawns.TryGetValue(locker.StructureType, out var list);
                 foreach (LockerChamber chamber in locker.Chambers)
                 {
                     if (toDestroy)
                     {
-                        foreach (ItemPickupBase pickup in (HashSet<ItemPickupBase>)field.GetValue(chamber))
+                        foreach (ItemPickupBase pickup in chamber._content)
                         {
                             pickup.DestroySelf();
                         }
