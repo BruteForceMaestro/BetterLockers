@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.Pickups;
+﻿using Exiled.API.Features;
+using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using UnityEngine;
 
@@ -13,8 +14,7 @@ namespace BetterLockers
         }
         public void OnRoundStart()
         {
-            var lockers = Object.FindObjectsOfType<Locker>();
-            foreach (var locker in lockers)
+            foreach (var locker in Map.Lockers)
             {
                 bool toDestroy = cfg.DisableBaseGameItems.TryGetValue(locker.StructureType, out bool destroy) && destroy;
                 bool toSpawn = cfg.LockerSpawns.TryGetValue(locker.StructureType, out var list);
